@@ -84,6 +84,7 @@ from starlette.responses import Response
 
 class DatabaseMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        from .database import get_db
         db = next(get_db())
         request.state.db = db
         try:
