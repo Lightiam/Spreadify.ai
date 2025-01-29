@@ -23,7 +23,7 @@ function App() {
     <div className="min-h-screen bg-primary-50">
       <header className="bg-primary-600 text-white p-4">
         <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Spreadify AI</h1>
+          <h1 className="text-2xl font-bold">Spreadify A</h1>
           <nav className="space-x-4">
             <button 
               className={`text-white hover:text-primary-200 ${currentView === 'dashboard' ? 'underline' : ''}`}
