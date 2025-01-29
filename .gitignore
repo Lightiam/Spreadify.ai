@@ -1,17 +1,19 @@
-# Environment variables
+# Configuration
 .env
-.env.local
-.env.*.local
+.env.*
+railway.toml
 
-# Build output
-dist/
-build/
+# Dependencies
 node_modules/
-
-# Python
 __pycache__/
 *.pyc
-.pytest_cache/
+.venv/
+venv/
+
+# Build
+dist/
+build/
+.next/
 
 # IDE
 .vscode/
@@ -19,6 +21,20 @@ __pycache__/
 
 # Logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+
+# System
+.DS_Store
+Thumbs.db
+
+# Database
+*.sqlite3
+*.db
+
+# Secrets
+*.pem
+*.key
+*.cert
+*.secret
+
+# Docker
+.docker/
