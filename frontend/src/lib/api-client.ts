@@ -73,17 +73,58 @@ class ApiClient {
 
   async loginWithGoogle(): Promise<void> {
     try {
-      // Add state parameter for CSRF protection
+      // Generate state for CSRF protection
       const state = Math.random().toString(36).substring(7);
       sessionStorage.setItem('oauth_state', state);
       
-      // Redirect to the backend's OAuth endpoint with state
-      const redirectUrl = `${this.baseUrl}/auth/login/google?state=${state}`;
+      // Store return path
+      const returnTo = window.location.pathname === '/login' ? '/studio' : window.location.pathname;
+      sessionStorage.setItem('returnTo', returnTo);
+      
+      // Build redirect URL with state and return path
+      const redirectUrl = `${this.baseUrl}/auth/login/google?state=${state}&returnTo=${encodeURIComponent(returnTo)}`;
       console.log('Redirecting to OAuth endpoint:', redirectUrl);
+      
+      // Set a flag to indicate we're in the OAuth flow
+      sessionStorage.setItem('oauth_pending', 'true');
+      
+      // Redirect to OAuth endpoint
       window.location.href = redirectUrl;
     } catch (error) {
       console.error('Failed to initiate Google login:', error);
       throw new Error('Failed to start authentication process');
+    }
+  }
+
+  async handleAuthCallback(token: string): Promise<void> {
+    try {
+      // Verify we were expecting an OAuth callback
+      const isPending = sessionStorage.getItem('oauth_pending');
+      if (!isPending) {
+        throw new Error('No pending OAuth flow');
+      }
+      
+      // Clear OAuth flow flags
+      sessionStorage.removeItem('oauth_pending');
+      sessionStorage.removeItem('oauth_state');
+      
+      // Store token
+      localStorage.setItem('token', token);
+      
+      // Set secure cookie for WebSocket access
+      const secure = window.location.protocol === 'https:';
+      const domain = window.location.hostname;
+      document.cookie = `token=${token}; path=/; ${secure ? 'secure;' : ''} domain=${domain}; samesite=lax; max-age=3600`;
+      
+      // Get stored return path or default to studio
+      const returnTo = sessionStorage.getItem('returnTo') || '/studio';
+      sessionStorage.removeItem('returnTo');
+      
+      // Redirect to appropriate page
+      window.location.href = returnTo;
+    } catch (error) {
+      console.error('Error handling auth callback:', error);
+      throw new Error('Failed to complete authentication');
     }
   }
 

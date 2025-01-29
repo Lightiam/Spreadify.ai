@@ -32,26 +32,37 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<Error | null>(null);
   
   useEffect(() => {
-    const publicPaths = ['/', '/login', '/pricing', '/success', '/privacy-policy'];
+    const publicPaths = ['/', '/login', '/pricing', '/success', '/privacy-policy', '/terms'];
     const isPublicPath = publicPaths.includes(window.location.pathname);
     
     const fetchUser = async () => {
       try {
-        const data = await apiClient.getCurrentUser();
-        setUser(data);
+        // Check if we have a token
+        const token = localStorage.getItem('token');
+        if (!token && !isPublicPath) {
+          // No token and not on public path - redirect to login
+          window.location.href = '/login';
+          return;
+        }
+        
+        if (token) {
+          // Only fetch user data if we have a token
+          const data = await apiClient.getCurrentUser();
+          setUser(data);
+        }
       } catch (err) {
-        setError(err as Error);
+        console.error('Error fetching user:', err);
+        // Clear invalid token
+        localStorage.removeItem('token');
+        if (!isPublicPath) {
+          window.location.href = '/login';
+        }
       } finally {
         setLoading(false);
       }
     };
     
-    // Skip auth check for public paths
-    if (isPublicPath) {
-      setLoading(false);
-    } else {
-      fetchUser();
-    }
+    fetchUser();
   }, []);
   
   const logout = async () => {
@@ -103,7 +114,7 @@ function AppContent() {
     );
   }
 
-  const publicPaths = ['/', '/login', '/pricing', '/success'];
+  const publicPaths = ['/', '/login', '/pricing', '/success', '/privacy-policy', '/terms'];
   const isPublicPath = publicPaths.includes(window.location.pathname);
 
   // Skip auth loading state for public paths

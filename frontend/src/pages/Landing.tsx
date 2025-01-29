@@ -25,17 +25,22 @@ export function LandingPage() {
           <div className="flex items-center space-x-4">
             <Button 
               variant="ghost" 
-              className="text-gray-700 hover:text-brand-600 hover:bg-brand-50/50 transition-all"
+              className="text-gray-700 hover:text-brand-600 hover:bg-brand-50/50 transition-all font-medium"
               asChild
             >
-              <Link to="/login">Sign In</Link>
+              <Link to="/login" className="flex items-center">
+                <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+                Sign In
+              </Link>
             </Button>
             <Button 
               variant="brand"
               className="shadow-md hover:shadow-brand-200/50 transition-all"
               asChild
             >
-              <Link to="/login">Get Started</Link>
+              <Link to="/pricing">Get Started</Link>
             </Button>
           </div>
         </nav>
@@ -84,7 +89,7 @@ export function LandingPage() {
                 className="w-full sm:w-auto font-semibold shadow-lg hover:shadow-brand-200/50 transition-all" 
                 asChild
               >
-                <Link to="/login">Get Started</Link>
+                <Link to="/pricing">Get Started</Link>
               </Button>
               <Button 
                 variant="outline" 
@@ -112,18 +117,14 @@ export function LandingPage() {
             <div className="relative z-10">
               <div className="w-full max-w-4xl mx-auto rounded-xl overflow-hidden bg-gradient-to-br from-brand-50 to-brand-100 p-1 shadow-lg">
                 <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-white">
-                  <video 
-                    key="showcase-video"
-                    className="w-full h-full object-cover"
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline
-                    preload="auto"
-                  >
-                    <source src="/assets/kawaii.mp4" type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
+                  <div className="w-full h-full bg-gradient-to-br from-brand-100 to-brand-200 flex items-center justify-center">
+                    <div className="text-brand-600 text-lg font-medium">
+                      <svg className="w-24 h-24 mb-4 mx-auto text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      Professional Live Streaming Studio
+                    </div>
+                  </div>
                   <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-300 video-loading">
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
                       <p className="text-white text-sm font-medium">Loading preview...</p>
