@@ -26,6 +26,31 @@ sqlalchemy = "^2.0.27"
 alembic = "^1.13.1"
 
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+pytest-asyncio = "^0.25.3"
+httpx = "^0.28.1"
+pytest-cov = "^6.0.0"
+pytest-env = "^1.1.5"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+sqlalchemy-utils = "^0.41.2"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+asyncio_mode = "strict"
+markers = [
+    "asyncio: mark test as async"
+]
+env = [
+    "JWT_SECRET=test-secret",
+    "GOOGLE_CLIENT_ID=test-client-id",
+    "GOOGLE_CLIENT_SECRET=test-client-secret",
+    "FRONTEND_URL=http://localhost:5173",
+    "PUBLIC_URL=http://localhost:8000",
+    "OAUTH_REDIRECT_URL=http://localhost:8000/auth/callback"
+]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
