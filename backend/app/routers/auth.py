@@ -159,6 +159,26 @@ async def auth_callback(request: Request, state: str = Query(None), error: str =
             # Verify email is verified (Google security requirement)
             if not user.get('email_verified'):
                 raise ValueError("Email not verified with Google")
+                
+            # Get database session from request state
+            db = request.state.db
+            
+            # Check if user exists, if not create new user
+            existing_user = crud.get_user_by_email(db, user["email"])
+            if not existing_user:
+                user_data = UserCreate(
+                    email=user["email"],
+                    name=user.get("name", ""),
+                    picture=user.get("picture", "")
+                )
+                db_user = crud.create_user(db, user_data)
+            else:
+                # Update existing user's information if needed
+                user_update = UserUpdate(
+                    name=user.get("name", existing_user.name),
+                    picture=user.get("picture", existing_user.picture)
+                )
+                db_user = crud.update_user(db, existing_user.id, user_update)
         except Exception as e:
             logger.error(f"OAuth token/user error: {str(e)}")
             return RedirectResponse(
@@ -170,8 +190,8 @@ async def auth_callback(request: Request, state: str = Query(None), error: str =
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
             data={
-                "sub": user["sub"],
-                "email": user["email"],
+                "sub": db_user.id,  # Use database user ID
+                "email": db_user.email,
                 "name": user.get("name", ""),
                 "picture": user.get("picture", ""),
                 "email_verified": user["email_verified"]

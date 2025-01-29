@@ -82,6 +82,16 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
+class DatabaseMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        db = next(get_db())
+        request.state.db = db
+        try:
+            response = await call_next(request)
+            return response
+        finally:
+            db.close()
+
 class WebSocketUpgradeMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         if "upgrade" in request.headers.get("connection", "").lower():
@@ -89,6 +99,8 @@ class WebSocketUpgradeMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         return response
 
+# Add middlewares in the correct order
+app.add_middleware(DatabaseMiddleware)
 app.add_middleware(WebSocketUpgradeMiddleware)
 
 app.add_middleware(
