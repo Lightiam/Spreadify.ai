@@ -10,10 +10,17 @@ restartPolicyType = "on_failure"
 
 [env]
 PYTHON_VERSION = "3.12"
-FRONTEND_URL = "https://stream-live-app-xabl732t.devinapps.com"
+PORT = "8000"
+FRONTEND_URL = "https://spreadify-ai.vercel.app"
 PUBLIC_URL = "https://spreadify-api.railway.app"
 OAUTH_REDIRECT_URL = "https://spreadify-api.railway.app/auth/callback"
-CORS_ORIGINS = '["https://stream-live-app-xabl732t.devinapps.com", "http://localhost:5173", "http://localhost:3000"]'
+CORS_ORIGINS = '["https://spreadify-ai.vercel.app", "http://localhost:5173", "http://localhost:3000"]'
+
+# Note: Sensitive environment variables should be set through Railway's dashboard:
+# - GOOGLE_CLIENT_ID
+# - GOOGLE_CLIENT_SECRET
+# - JWT_SECRET
+# - STRIPE_SECRET_KEY
 
 [[services]]
 name = "spreadify-backend"

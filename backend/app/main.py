@@ -4,6 +4,7 @@ import os
 import json
 from dotenv import load_dotenv
 from pathlib import Path
+import datetime
 
 # Load environment variables before anything else
 env_path = Path(__file__).resolve().parent.parent / '.env'
@@ -33,8 +34,16 @@ print(f"FRONTEND_URL: {os.environ.get('FRONTEND_URL')}")
 print(f"PUBLIC_URL: {os.environ.get('PUBLIC_URL')}")
 print(f"OAUTH_REDIRECT_URL: {os.environ.get('OAUTH_REDIRECT_URL')}")
 
+# Import database and models
+from .database import engine, init_db
+from .models import Base
+
 # Import routers after environment variables are loaded
 from .routers import auth, streams, webrtc, stripe
+
+# Initialize database tables
+Base.metadata.create_all(bind=engine)
+init_db()
 
 # Initialize FastAPI app with configuration
 app = FastAPI(
@@ -42,6 +51,11 @@ app = FastAPI(
     description="A multi-platform live streaming and recording platform",
     version="1.0.0"
 )
+
+@app.get("/healthz")
+async def healthcheck():
+    """Health check endpoint for Railway deployment."""
+    return {"status": "healthy", "timestamp": datetime.datetime.now().isoformat()}
 
 # Get frontend URLs from environment
 FRONTEND_URLS = json.loads(os.environ.get("CORS_ORIGINS", '["http://localhost:5173", "http://localhost:3000"]'))
