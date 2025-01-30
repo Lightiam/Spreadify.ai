@@ -2,7 +2,7 @@ services:
   - type: web
     name: spreadify-backend
     env: docker
-    plan: free
+    plan: starter
     region: oregon
     branch: main
     rootDir: backend
@@ -17,7 +17,9 @@ services:
       - key: PUBLIC_URL
         value: https://spreadify-api.onrender.com
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: spreadify-db
+          property: connectionString
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
@@ -28,3 +30,9 @@ services:
         sync: false
     buildCommand: docker build -t spreadify-backend .
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 4
+    autoDeploy: true
+
+databases:
+  - name: spreadify-db
+    plan: starter
+    ipAllowList: []
