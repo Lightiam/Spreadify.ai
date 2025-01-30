@@ -16,12 +16,10 @@ PUBLIC_URL = "https://spreadify-api.railway.app"
 OAUTH_REDIRECT_URL = "https://spreadify-api.railway.app/auth/callback"
 CORS_ORIGINS = '["https://spreadify-ai.vercel.app", "http://localhost:5173", "http://localhost:3000"]'
 DATABASE_URL = "${{Postgres.DATABASE_URL}}"
-
-# Note: Sensitive environment variables should be set through Railway's dashboard:
-# - GOOGLE_CLIENT_ID
-# - GOOGLE_CLIENT_SECRET
-# - JWT_SECRET
-# - STRIPE_SECRET_KEY
+GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID"
+GOOGLE_CLIENT_SECRET = "YOUR_GOOGLE_CLIENT_SECRET"
+JWT_SECRET = "YOUR_JWT_SECRET"
+STRIPE_SECRET_KEY = "YOUR_STRIPE_SECRET_KEY"
 
 [[services]]
 name = "spreadify-backend"
