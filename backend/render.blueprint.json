@@ -1,14 +1,17 @@
 {
+  "blueprintVersion": 2,
   "services": [
     {
-      "type": "web",
+      "type": "web_service",
       "name": "spreadify-backend",
-      "env": "docker",
-      "region": "oregon",
-      "plan": "starter",
+      "runtime": "docker",
+      "repo": "https://github.com/Lightiam/Spreadify.ai.git",
       "branch": "main",
       "rootDir": "backend",
       "dockerfilePath": "./Dockerfile",
+      "region": "oregon",
+      "plan": "starter",
+      "numInstances": 1,
       "healthCheckPath": "/healthz",
       "envVars": [
         {
@@ -24,8 +27,7 @@
           "value": "https://spreadify-api.onrender.com"
         }
       ],
-      "autoDeploy": true,
-      "repo": "https://github.com/Lightiam/Spreadify.ai.git"
+      "autoDeploy": true
     }
   ]
 }
