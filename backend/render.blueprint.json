@@ -1,0 +1,33 @@
+{
+  "blueprintVersion": 2,
+  "services": [
+    {
+      "type": "web_service",
+      "name": "spreadify-backend",
+      "runtime": "docker",
+      "repo": "https://github.com/Lightiam/Spreadify.ai.git",
+      "branch": "main",
+      "rootDir": "backend",
+      "dockerfilePath": "./Dockerfile",
+      "region": "oregon",
+      "plan": "starter",
+      "numInstances": 1,
+      "healthCheckPath": "/healthz",
+      "envVars": [
+        {
+          "key": "PORT",
+          "value": "8000"
+        },
+        {
+          "key": "FRONTEND_URL",
+          "value": "https://spreadify-ai.vercel.app"
+        },
+        {
+          "key": "PUBLIC_URL",
+          "value": "https://spreadify-api.onrender.com"
+        }
+      ],
+      "autoDeploy": true
+    }
+  ]
+}
