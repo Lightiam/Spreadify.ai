@@ -1,3 +1,4 @@
+from datetime import timezone
 from typing import Optional
 from sqlalchemy.orm import Session
 from ..schemas.auth import UserCreate, UserUpdate, User

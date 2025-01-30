@@ -1,3 +1,4 @@
+from datetime import timezone
 from jose import jwt
 from datetime import datetime, timedelta, UTC
 import os

@@ -1,3 +1,4 @@
+from datetime import timezone
 import pytest
 from fastapi import status
 from app.schemas.auth import UserCreate

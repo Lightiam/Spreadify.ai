@@ -1,3 +1,4 @@
+from datetime import timezone
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from typing import List, Dict
 import uuid
@@ -22,7 +23,7 @@ async def create_stream(
         id=stream_id,
         user_id=current_user.email,
         status="created",
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(timezone.utc),
         **stream.dict()
     )
     streams[stream_id] = new_stream
