@@ -22,8 +22,26 @@ jobs:
       - name: Deploy to Render
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          PORT: 8000
+          FRONTEND_URL: https://spreadify-ai.vercel.app
+          PUBLIC_URL: https://spreadify-api.onrender.com
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
         run: |
-          render blueprint launch --api-key $RENDER_API_KEY
+          # Deploy using blueprint
+          render blueprint launch \
+            --api-key $RENDER_API_KEY \
+            --env PORT=$PORT \
+            --env FRONTEND_URL=$FRONTEND_URL \
+            --env PUBLIC_URL=$PUBLIC_URL \
+            --env DATABASE_URL=$DATABASE_URL \
+            --env GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
+            --env GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
+            --env JWT_SECRET=$JWT_SECRET \
+            --env STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY
           
       - name: Verify Deployment
         run: |
@@ -46,6 +64,12 @@ jobs:
           
           echo "Deployment verification failed after $MAX_RETRIES attempts"
           exit 1
+          
+      - name: Verify Environment Variables
+        run: |
+          echo "Verifying environment variables..."
+          curl -f "https://spreadify-api.onrender.com/healthz" \
+            -H "X-Environment-Check: true"
           
       - name: Notify on Success
         if: success()
