@@ -10,19 +10,51 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
     
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
+      - name: Install Render CLI
+        run: curl -L https://render.com/download/cli | bash
+      
       - name: Deploy to Render
-        uses: johnbeynon/render-deploy-action@v0.0.8
-        with:
-          service-id: ${{ secrets.RENDER_SERVICE_ID }}
-          api-key: ${{ secrets.RENDER_API_KEY }}
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          render blueprint launch --api-key $RENDER_API_KEY
           
-      - name: Wait for Deployment
+      - name: Verify Deployment
         run: |
           echo "Waiting for deployment to complete..."
-          sleep 30
-          curl -f https://spreadify-api.onrender.com/healthz || exit 1
+          sleep 45  # Give more time for the deployment to stabilize
+          
+          MAX_RETRIES=5
+          RETRY_COUNT=0
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if curl -f https://spreadify-api.onrender.com/healthz; then
+              echo "Deployment verified successfully!"
+              exit 0
+            fi
+            
+            echo "Health check failed, retrying in 30 seconds..."
+            sleep 30
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+          done
+          
+          echo "Deployment verification failed after $MAX_RETRIES attempts"
+          exit 1
+          
+      - name: Notify on Success
+        if: success()
+        run: |
+          echo "✅ Deployment to Render completed successfully!"
+          echo "API is accessible at https://spreadify-api.onrender.com"
+          
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "❌ Deployment to Render failed"
+          echo "Please check the Render dashboard for more details"
