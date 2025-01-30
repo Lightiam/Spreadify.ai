@@ -12,45 +12,7 @@ services:
         value: https://spreadify-ai.vercel.app
       - key: PUBLIC_URL
         value: https://spreadify-api.onrender.com
-      - key: OAUTH_REDIRECT_URL
-        value: https://spreadify-api.onrender.com/auth/callback
-      - key: CORS_ORIGINS
-        value: '["https://spreadify-ai.vercel.app", "http://localhost:5173", "http://localhost:3000"]'
-      - key: DATABASE_URL
-        sync: false
-      - key: GOOGLE_CLIENT_ID
-        sync: false
-      - key: GOOGLE_CLIENT_SECRET
-        sync: false
-      - key: JWT_SECRET
-        sync: false
-      - key: STRIPE_SECRET_KEY
-        sync: false
-      - key: STRIPE_WEBHOOK_SECRET
-        sync: false
     healthCheckPath: /healthz
     buildCommand: docker build -t spreadify-backend .
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 4
     autoDeploy: true
-    domains:
-      - spreadify-api.onrender.com
-    disk:
-      name: tmp
-      mountPath: /tmp
-      sizeGB: 1
-    healthCheck:
-      path: /healthz
-      port: 8000
-      interval: 30s
-      timeout: 10s
-      gracePeriod: 120s
-      startPeriod: 30s
-    scaling:
-      minInstances: 1
-      maxInstances: 3
-      targetMemoryPercent: 80
-      targetCPUPercent: 75
-    metrics:
-      - type: cpu
-      - type: memory
-      - type: requests
