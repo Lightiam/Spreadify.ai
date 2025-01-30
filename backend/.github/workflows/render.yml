@@ -8,7 +8,25 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install
+      - name: Run tests
+        run: poetry run pytest
+
   deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
     
@@ -19,20 +37,20 @@ jobs:
       - name: Deploy to Render
         uses: johnbeynon/render-deploy-action@v0.0.8
         with:
-          service-id: srv-${{ secrets.RENDER_SERVICE_ID }}
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
           api-key: ${{ secrets.RENDER_API_KEY }}
+          
+      - name: Wait for deployment
+        run: sleep 45
           
       - name: Verify Deployment
         run: |
-          echo "Waiting for deployment to complete..."
-          sleep 45
-          
           MAX_RETRIES=5
           RETRY_COUNT=0
           
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
             if curl -f https://spreadify-api.onrender.com/healthz; then
-              echo "Deployment verified successfully!"
+              echo "✅ Deployment verified successfully!"
               exit 0
             fi
             
@@ -41,5 +59,17 @@ jobs:
             RETRY_COUNT=$((RETRY_COUNT + 1))
           done
           
-          echo "Deployment verification failed after $MAX_RETRIES attempts"
+          echo "❌ Deployment verification failed after $MAX_RETRIES attempts"
           exit 1
+
+      - name: Notify on Success
+        if: success()
+        run: |
+          echo "✅ Deployment to Render completed successfully!"
+          echo "API is accessible at https://spreadify-api.onrender.com"
+          
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "❌ Deployment to Render failed"
+          echo "Please check the Render dashboard for more details"
