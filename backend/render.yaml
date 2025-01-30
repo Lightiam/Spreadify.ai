@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: spreadify-backend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    region: oregon
+    plan: starter
+    healthCheckPath: /healthz
+    buildCommand: docker build -t spreadify-backend .
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: FRONTEND_URL
+        value: https://spreadify-ai.vercel.app
+      - key: PUBLIC_URL
+        value: https://spreadify-api.onrender.com
+      - key: OAUTH_REDIRECT_URL
+        value: https://spreadify-api.onrender.com/auth/callback
+      - key: CORS_ORIGINS
+        value: '["https://spreadify-ai.vercel.app", "http://localhost:5173", "http://localhost:3000"]'
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+    autoDeploy: true
+    domains:
+      - spreadify-api.onrender.com
+    disk:
+      name: tmp
+      mountPath: /tmp
+      sizeGB: 1
+    healthCheck:
+      httpPath: /healthz
+      port: 8000
+      initialDelaySeconds: 10
+      periodSeconds: 30
+    scaling:
+      minInstances: 1
+      maxInstances: 1
+      targetMemoryPercent: 80
+    sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBmizEVT0nNlXgH+w5xuJ/LoJ7NkWi1ahdZNmmHhKHN3 spreadify-render-deploy

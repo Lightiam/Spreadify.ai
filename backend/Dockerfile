@@ -20,11 +20,12 @@ RUN pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false && \
     poetry install --no-interaction --no-ansi
 
-# Copy application code
-COPY . .
-
 # Set environment variables
 ENV PYTHONPATH="/app"
+ENV DATABASE_URL="sqlite:///./test.db"
+
+# Copy application code
+COPY . .
 ENV PORT=8000
 ENV PYTHONUNBUFFERED=1
 
