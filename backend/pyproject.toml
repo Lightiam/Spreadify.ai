@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "spreadify-backend"
+version = "0.1.0"
+description = "Backend for Spreadify.ai streaming platform"
+authors = ["Devin <devin@spreadify.ai>"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.7"
+uvicorn = "^0.34.0"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+python-multipart = "^0.0.20"
+requests = "^2.32.3"
+websockets = "^14.2"
+itsdangerous = "^2.2.0"
+pyjwt = "^2.10.1"
+stripe = "^11.5.0"
+sqlalchemy = "^2.0.37"
+alembic = "^1.14.1"
+psycopg2-binary = "^2.9.10"
+alembic-postgresql-enum = "^1.6.0"
+python-dotenv = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+pytest-asyncio = "^0.25.3"
+httpx = "^0.28.1"
+pytest-cov = "^6.0.0"
+pytest-env = "^1.1.5"
+sqlalchemy-utils = "^0.41.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
