@@ -7,7 +7,7 @@ services:
     plan: starter
     healthCheckPath: /healthz
     buildCommand: docker build -t spreadify-backend .
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 4
     envVars:
       - key: PORT
         value: 8000
@@ -19,6 +19,8 @@ services:
         value: https://spreadify-api.onrender.com/auth/callback
       - key: CORS_ORIGINS
         value: '["https://spreadify-ai.vercel.app", "http://localhost:5173", "http://localhost:3000"]'
+      - key: DATABASE_URL
+        sync: false
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
@@ -26,6 +28,8 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
         sync: false
     autoDeploy: true
     domains:
@@ -39,8 +43,15 @@ services:
       port: 8000
       initialDelaySeconds: 10
       periodSeconds: 30
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 3
     scaling:
       minInstances: 1
-      maxInstances: 1
+      maxInstances: 3
       targetMemoryPercent: 80
-    sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBmizEVT0nNlXgH+w5xuJ/LoJ7NkWi1ahdZNmmHhKHN3 spreadify-render-deploy
+      targetCPUPercent: 75
+    metrics:
+      - type: cpu
+      - type: memory
+      - type: requests
