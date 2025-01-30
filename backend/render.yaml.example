@@ -1,0 +1,35 @@
+services:
+  - type: web_service
+    name: spreadify-backend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    region: oregon
+    plan: starter
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: FRONTEND_URL
+        value: https://spreadify-ai.vercel.app
+      - key: PUBLIC_URL
+        value: https://spreadify-api.onrender.com
+      - key: DATABASE_URL
+        fromDatabase:
+          name: spreadify-db
+          property: connectionString
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: STRIPE_SECRET_KEY
+        sync: false
+    healthCheckPath: /healthz
+    buildCommand: docker build -t spreadify-backend .
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 4
+    autoDeploy: true
+
+databases:
+  - name: spreadify-db
+    plan: starter
+    ipAllowList: []

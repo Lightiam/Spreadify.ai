@@ -33,3 +33,5 @@ logs/
 
 # Docker
 .docker/
+render.yaml
+render.blueprint.json
