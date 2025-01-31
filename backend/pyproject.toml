@@ -8,7 +8,7 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = "^0.115.7"
-uvicorn = "^0.34.0"
+uvicorn = {extras = ["standard"], version = "^0.34.0"}
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 python-multipart = "^0.0.20"
 requests = "^2.32.3"
@@ -23,14 +23,29 @@ alembic-postgresql-enum = "^1.6.0"
 python-dotenv = "^1.0.1"
 email-validator = "^2.1.0.post1"
 pydantic-settings = "^2.7.1"
-
+aiosqlite = "^0.19.0"  # For async SQLite support
+authlib = "^1.4.1"
+httpx = "^0.28.1"  # Required for Authlib's async support
+pytest = "^8.3.4"  # Moving to main dependencies for testing
+pytest-asyncio = "^0.25.3"
+pytest-env = "^1.1.5"
+pytest-cov = "^6.0.0"  # For test coverage reporting
+sqlalchemy-utils = "^0.41.2"  # For database testing utilities
 [tool.poetry.group.dev.dependencies]
+httpx = "^0.28.1"
 pytest = "^8.3.4"
 pytest-asyncio = "^0.25.3"
-httpx = "^0.28.1"
 pytest-cov = "^6.0.0"
 pytest-env = "^1.1.5"
-sqlalchemy-utils = "^0.41.2"
+pytest-mock = "^3.14.0"
+pytest-xdist = "^3.6.1"
+
+[tool.pytest.ini_options]
+env = [
+    "TEST_ENV=1",
+    "DATABASE_URL=sqlite:///:memory:",
+    "LOG_LEVEL=debug"
+]
 
 [build-system]
 requires = ["poetry-core"]

@@ -29,10 +29,9 @@ ENV PORT=8000
 ENV PYTHONUNBUFFERED=1
 ENV DOCKER_ENV=1
 
-# Create data directory and set permissions
+# Create data directory with proper permissions
 RUN mkdir -p /app/data && \
-    chown -R nobody:nogroup /app/data && \
-    chmod 755 /app/data
+    chmod 777 /app/data
 
 # Copy application code
 COPY . .

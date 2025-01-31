@@ -1,5 +1,6 @@
 from fastapi import APIRouter, WebSocket, HTTPException, status, Query, Depends
-from jose import JWTError, jwt
+import jwt
+from jwt.exceptions import InvalidTokenError
 import os
 import logging
 import base64
@@ -83,7 +84,7 @@ async def websocket_endpoint(
             if not user_id:
                 await websocket.close(code=4001, reason="Invalid token")
                 return
-        except JWTError:
+        except InvalidTokenError:
             await websocket.close(code=4001, reason="Invalid token")
             return
             

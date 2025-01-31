@@ -23,6 +23,16 @@ class UserInDB(UserBase):
     class Config:
         from_attributes = True
 
+class UserResponse(UserBase):
+    id: int
+    google_id: str
+    access_token: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"

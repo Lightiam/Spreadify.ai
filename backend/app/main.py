@@ -19,6 +19,14 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Configure session middleware (required for OAuth)
+from starlette.middleware.sessions import SessionMiddleware
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.getenv("JWT_SECRET", "dev_jwt_secret_key_replace_in_production"),
+    max_age=3600  # 1 hour
+)
+
 # Configure CORS
 cors_origins = eval(os.getenv("CORS_ORIGINS", '["http://localhost:5173"]'))
 app.add_middleware(
@@ -32,8 +40,6 @@ app.add_middleware(
 # Include routers with database dependency
 app.include_router(
     auth.router,
-    prefix="/auth",
-    tags=["auth"],
     dependencies=[Depends(get_db)]
 )
 app.include_router(
