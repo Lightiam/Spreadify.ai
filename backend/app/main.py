@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 from app.database import init_db, get_db
 from app.routers import auth, streams, stripe, webrtc
@@ -49,7 +50,7 @@ app.include_router(
 )
 app.include_router(
     webrtc.router,
-    prefix="/webrtc",
+    prefix="",  # Remove prefix to allow direct /ws access
     tags=["webrtc"],
     dependencies=[Depends(get_db)]
 )
@@ -58,28 +59,37 @@ app.include_router(
 @app.get("/healthz")
 async def health_check(db: Session = Depends(get_db)):
     try:
-        # Basic health check first
-        basic_health = {
+        health_status = {
             "status": "healthy",
             "version": "1.0.0",
+            "timestamp": datetime.utcnow().isoformat(),
+            "tests": {}
         }
 
-        # Try to verify database connection
+        # Database connection test
         try:
             db.execute(text("SELECT 1"))
-            basic_health["database"] = "connected"
+            health_status["tests"]["database_connection"] = {
+                "status": "passed",
+                "message": "Successfully connected to database"
+            }
         except Exception as db_err:
             print(f"Database connection error: {str(db_err)}")
-            basic_health["database"] = "error"
-            basic_health["database_error"] = str(db_err)
-            return basic_health
+            health_status["tests"]["database_connection"] = {
+                "status": "failed",
+                "error": str(db_err)
+            }
+            health_status["status"] = "error"
+            return health_status
 
-        # Try to verify CRUD operations
+        # CRUD operations test
         try:
             from app.crud.user import create_user, get_user_by_email, update_user, delete_user
             from app.schemas.auth import UserCreate, UserUpdate
             
-            # Create test user
+            crud_results = []
+            
+            # Test Create
             test_user = UserCreate(
                 email="test@example.com",
                 name="Test User",
@@ -87,42 +97,69 @@ async def health_check(db: Session = Depends(get_db)):
                 picture="https://example.com/pic.jpg"
             )
             db_user = create_user(db, test_user)
+            crud_results.append(("create", True, "User created successfully"))
             
-            # Verify user was created
+            # Test Read
             found_user = get_user_by_email(db, "test@example.com")
             if not found_user:
-                raise Exception("Failed to create and retrieve user")
-                
-            # Update user
+                raise Exception("Failed to retrieve created user")
+            crud_results.append(("read", True, "User retrieved successfully"))
+            
+            # Test Update
             update_data = UserUpdate(name="Updated Test User")
             updated_user = update_user(db, found_user.id, update_data)
             if updated_user.name != "Updated Test User":
-                raise Exception("Failed to update user")
-                
-            # Delete user
+                raise Exception("User update failed")
+            crud_results.append(("update", True, "User updated successfully"))
+            
+            # Test Delete
             deleted_user = delete_user(db, found_user.id)
             if not deleted_user:
-                raise Exception("Failed to delete user")
-                
-            # Verify deletion
+                raise Exception("User deletion failed")
+            crud_results.append(("delete", True, "User deleted successfully"))
+            
+            # Verify Deletion
             deleted_check = get_user_by_email(db, "test@example.com")
             if deleted_check:
-                raise Exception("User was not properly deleted")
+                raise Exception("User still exists after deletion")
+            crud_results.append(("verify_deletion", True, "Deletion verified"))
             
-            basic_health["crud_test"] = "passed"
+            # Add CRUD test results
+            health_status["tests"]["crud_operations"] = {
+                "status": "passed",
+                "operations": {op: {"status": status, "message": msg} for op, status, msg in crud_results}
+            }
+            
         except Exception as crud_err:
             print(f"CRUD test error: {str(crud_err)}")
-            basic_health["crud_test"] = "error"
-            basic_health["crud_error"] = str(crud_err)
+            health_status["tests"]["crud_operations"] = {
+                "status": "failed",
+                "error": str(crud_err)
+            }
+            health_status["status"] = "error"
         
-        return basic_health
+        # WebSocket connection count
+        try:
+            from app.routers.webrtc import connections
+            health_status["tests"]["websocket"] = {
+                "status": "passed",
+                "active_connections": len(connections)
+            }
+        except Exception as ws_err:
+            health_status["tests"]["websocket"] = {
+                "status": "failed",
+                "error": str(ws_err)
+            }
+        
+        return health_status
 
     except Exception as e:
         print(f"Health check error: {str(e)}")
         return {
             "status": "error",
             "error": str(e),
-            "version": "1.0.0"
+            "version": "1.0.0",
+            "timestamp": datetime.utcnow().isoformat()
         }
 
 # Initialize database on startup
