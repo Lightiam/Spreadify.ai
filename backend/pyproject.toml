@@ -21,6 +21,8 @@ alembic = "^1.14.1"
 psycopg2-binary = "^2.9.10"
 alembic-postgresql-enum = "^1.6.0"
 python-dotenv = "^1.0.1"
+email-validator = "^2.1.0.post1"
+pydantic-settings = "^2.7.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"

@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     git \
     libpq-dev \
     curl \
+    libsqlite3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency files
@@ -22,22 +23,16 @@ RUN pip install --no-cache-dir poetry && \
 
 # Set environment variables
 ENV PYTHONPATH="/app"
-ENV DATABASE_URL="sqlite:///./test.db"
-
-# Copy application code
-COPY . .
+ENV DATABASE_URL="sqlite:////app/data/app.db"
 ENV PORT=8000
 ENV PYTHONUNBUFFERED=1
 
-# Create necessary directories
-RUN mkdir -p /app/logs
+# Copy application code
+COPY . .
 
-# Set permissions
-RUN chown -R nobody:nogroup /app && \
-    chmod -R 755 /app
-
-# Switch to non-root user
-USER nobody
+# Copy entrypoint script
+COPY docker-entrypoint.sh /app/
+RUN chmod +x /app/docker-entrypoint.sh
 
 # Expose port
 EXPOSE 8000
@@ -46,5 +41,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/healthz || exit 1
 
-# Start application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+# Use entrypoint script
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
