@@ -14,5 +14,4 @@ python3 /app/scripts/configure_alembic.py
 # Switch to nobody user and run migrations
 su nobody -s /bin/bash -c "alembic upgrade head"
 
-# Start application with a single worker
-exec su nobody -s /bin/bash -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1"
+# Start application (CMD from Dockerfile will be used)

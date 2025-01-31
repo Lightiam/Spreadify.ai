@@ -19,7 +19,8 @@ COPY pyproject.toml poetry.lock ./
 # Install Python dependencies
 RUN pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false && \
-    poetry install --no-interaction --no-ansi
+    poetry install --no-interaction --no-ansi && \
+    pip install "uvicorn[standard]"
 
 # Set environment variables
 ENV PYTHONPATH="/app"
@@ -49,3 +50,5 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 
 # Use entrypoint script
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
